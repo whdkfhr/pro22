@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<!-- 
+		action-servlet.xml역할
+		
+		SimpleUrlController클래스에 대해 id속성값이  simpleUrlController인 빈을 생성합니다.
+	       스프링의 SimpleUrlHandlerMapping클래스 빈을 생성하면  
+	    /test/index.do에 대해 처리하는 컨트롤러SimpleUrlController로 설정한다.
+	
+		
+ 	<bean  id="객체를 식별할 고유값" class="생성할 객체(빈)의 클래스 경로 작성 "     />  
+		
+		SimpleUrlController클래스의  객체 생성 
+		<bean  id="simpleUrlController" class="com.spring.ex01.SimpleUrlController"/>
+
+		SimpleUrlHandlerMapping클래스의 객체 생성 
+		<bean id="urlMapping" 
+		     class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+				
+			<property name="mappings">
+				<props>
+					<prop key="/test/index.do">simpleUrlController</prop>
+				</props>
+			</property>
+		
+		</bean>
+		
+			참고 : xml설정 파일 이름은 반드시 web.xml의 서블릿 매핑시 사용했던
+			<servlet-name>태그의 값인 action으로 시작해야 합니다.
+			pro21프로젝트에서는 web.xml에서 태그 값을 action으로 설정 했으므로
+			action1-servlet.xml로 잘목 지정하면 톰캣 실행시 오류가 발생함. 
+		
+		
+	 -->	
+	 
+	 
+<!-- 
+action-servlet.xml설명
+웹브라우저에서 /test/*.do로 호출하면 userUrlMapping 빈을 이용해 userController빈을 호출함.
+userController빈의  methodNameResolver프로퍼티에는 userMethodNameResolver빈이 주입되어 있으므로
+/test/login.do로 요청하면 userController 빈의  login메소드를 호출합니다.
+또한 userMethodNameResolver는 스프링의 PropertiesMethodResolver클래스를 이용해 요청주소명에 대해
+호출할 메소드를 바로 지정 합니다.	
+ -->
+	
+	<!-- 
+		UserController컨트롤러에서 ModelAndView 인자로 뷰이름이 반환되면
+		InternalResourceViewResolver의 프로퍼티 priex속성에 지정된 /test폴더에서
+		ModelandView 인자로 넘어온 뷰이름에 해당되는 JSP를 선택해 
+		DispatcherServlet으로 보냅니다.
+	
+	    result라는 뷰이름 만 전달 받아 아래의 경로를 만들어서 DispatcherServlet으로 뷰 경로를 전달 함.
+		/test/result.jsp
+	 -->
+ 	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass"
+			value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix" value="/WEB-INF/views" />
+		<property name="suffix" value=".jsp" />
+	</bean> 
+
+	<!--
+		MemberControllerImpl 빈 생성시...
+		MemberServiceImpl 빈과 PropertiesMethodNameResolver 주입
+	-->
+	<bean id="memberController" class="com.spring.member.controller.MemberControllerImpl">
+		<property name="methodNameResolver">
+			<ref local="methodResolver" />
+		</property>
+		<property name="memberService" ref="memberService"/>
+	</bean>
+
+	<bean id="methodResolver" class="org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver">
+		<!-- URL 요청명에 대해 동일한 이름의 메소드를 호출하도록 설정 -->
+		<property name="mappings">
+			<props>
+				<prop key="/member/listMembers.do">listMembers</prop>
+				<prop key="/member/addMember.do">addMember</prop>
+				<prop key="/member/memberForm.do">memberForm</prop>
+				<prop key="/member/memberDetail.do">memberDetail</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- URL요청명이 /member/*.do로 시작되면  UserController를 요청하게 설정 -->
+	<bean id="urlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="mappings">
+			<props>
+				<prop key="/member/*.do">memberController</prop>
+			</props>
+		</property>
+	</bean>
+</beans>
+
+
+
+
+
+
+

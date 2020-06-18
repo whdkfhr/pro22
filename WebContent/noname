@@ -1,0 +1,13 @@
+
+
+1. 모든 회워정보를 조회 시켜줘 라는 요청을 Dispatcher 서블릿으로 한다.
+요청주소 : http:localhost:8090/pro22/member/listMembers.do
+
+2. web.xml --> *.do주소로 요청이 들어오면 Dispatcher 서블릿이 주소를 받는다.
+
+3. web.xml --> action-servlet.xml로 가서
+				PropertiesMethodNameResolver 빈의 설정을 통해
+				MemberControllerImpl 컨트롤러 클래스의
+				listMembers()메소드를 호출하여 모든 회원정보를 조회하는 부분으로 가게된다.
+				
+4. MemberControllerImpl의 listMembers()메소드 내부에서 작업!
